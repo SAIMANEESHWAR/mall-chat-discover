@@ -1,134 +1,130 @@
-
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { toast } from "sonner";
-import { ShoppingBag } from 'lucide-react';
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import OtpInput from "otp-input-react";
+import { toast } from "@/components/ui/use-toast";
 
 const VerifyOTP = () => {
+  const [otp, setOtp] = useState("");
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [otp, setOtp] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [countdown, setCountdown] = useState(60);
-  const [tempUser, setTempUser] = useState<{ name?: string; email?: string } | null>(null);
 
-  useEffect(() => {
-    const userData = localStorage.getItem('tempUser');
-    if (!userData) {
-      toast.error("No user found. Please register first.");
-      navigate('/register');
-      return;
-    }
-    
-    setTempUser(JSON.parse(userData));
-    
-    // Countdown timer for resend OTP
-    const timer = setInterval(() => {
-      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-    
-    return () => {
-      clearInterval(timer);
-    };
-  }, [navigate]);
+  const email = searchParams.get("email");
 
-  const handleVerify = () => {
-    if (!otp || otp.length !== 6) {
-      toast.error("Please enter a valid 6-digit OTP");
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    // This would be replaced with actual API call in a real app
-    setTimeout(() => {
-      // Simulate successful verification
-      const user = {
-        ...tempUser,
-        verified: true,
-      };
-      localStorage.removeItem('tempUser');
-      localStorage.setItem('user', JSON.stringify(user));
-      toast.success("Email verified successfully!");
-      navigate('/dashboard');
-      setIsLoading(false);
-    }, 1500);
+  const verifyOtpMutation = useMutation({
+    mutationFn: async (otp: string) => {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to verify OTP");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "OTP Verified",
+        description: "Your OTP has been verified successfully.",
+      });
+      navigate("/dashboard");
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error?.message || "Failed to verify OTP.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleVerifyOtp = () => {
+    verifyOtpMutation.mutate(otp);
   };
 
-  const handleResendOTP = () => {
-    if (countdown > 0) return;
-    
-    toast.info("New OTP has been sent to your email.");
-    setCountdown(60);
+  const renderInput = (props: any) => {
+    return (
+      <div className="flex justify-between gap-2">
+        {props.cells.map((cell: any, i: number) => (
+          <div 
+            key={i}
+            className={cn(
+              "relative flex h-14 w-10 items-center justify-center rounded-md border text-sm transition-all",
+              cell.hasFakeCaret && "animate-pulse",
+              cell.isActive && "border-primary",
+              !cell.isActive && cell.char && "border-border bg-secondary text-foreground"
+            )}
+          >
+            {cell.char || " "}
+            <input
+              index={i}
+              style={{
+                MozAppearance: "textfield",
+                caretColor: "transparent",
+              }}
+              readOnly={true}
+              isActive={cell.isActive}
+              char={cell.char}
+              hasFakeCaret={cell.hasFakeCaret}
+              key={cell.key}
+              {...props.getCellProps({
+                elemIndex: i,
+              })}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-mall-light p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <div className="bg-mall-primary p-3 rounded-full">
-              <ShoppingBag className="h-6 w-6 text-white" />
-            </div>
-          </div>
-          <CardTitle className="text-2xl font-bold">Email Verification</CardTitle>
+    <div className="grid h-screen place-items-center">
+      <Card className="w-[350px]">
+        <CardHeader>
+          <CardTitle>Verify OTP</CardTitle>
           <CardDescription>
-            We've sent a 6-digit verification code to {tempUser?.email || "your email"}. 
-            Enter the code below to confirm your email address.
+            Enter the 6-digit OTP sent to your email.
           </CardDescription>
         </CardHeader>
-        
-        <CardContent className="space-y-6">
-          <div className="flex justify-center">
-            <InputOTP
+        <CardContent className="grid gap-4">
+          <div className="grid gap-2">
+            <OtpInput
               value={otp}
               onChange={setOtp}
-              maxLength={6}
-              render={({ slots }) => (
-                <InputOTPGroup>
-                  {slots.map((slot, index) => (
-                    <InputOTPSlot key={index} {...slot} />
-                  ))}
-                </InputOTPGroup>
-              )}
+              numInputs={6}
+              renderInput={renderInput}
+              inputStyle={{
+                width: "100%",
+                padding: "0",
+                margin: "0",
+                border: "none",
+                outline: "none",
+                backgroundColor: "transparent",
+                textAlign: "center",
+                font: "inherit",
+                color: "inherit",
+              }}
+              containerStyle={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.5rem",
+              }}
             />
           </div>
-          
-          <Button 
-            onClick={handleVerify} 
-            className="w-full bg-mall-primary hover:bg-mall-dark"
-            disabled={isLoading || otp.length !== 6}
-          >
-            {isLoading ? "Verifying..." : "Verify Email"}
+          <Button onClick={handleVerifyOtp} disabled={verifyOtpMutation.isLoading}>
+            {verifyOtpMutation.isLoading ? "Verifying..." : "Verify OTP"}
           </Button>
-          
-          <div className="text-center">
-            <p className="text-sm text-gray-500">
-              Didn't receive the code?{" "}
-              <button
-                onClick={handleResendOTP}
-                disabled={countdown > 0}
-                className={`text-mall-primary font-medium ${
-                  countdown > 0 ? "opacity-50 cursor-not-allowed" : "hover:underline"
-                }`}
-              >
-                Resend
-              </button>
-              {countdown > 0 && <span className="text-gray-500"> in {countdown}s</span>}
-            </p>
-          </div>
         </CardContent>
-        
-        <CardFooter className="justify-center">
-          <p className="text-xs text-gray-500 text-center">
-            By verifying your email, you're creating a MallChat account, and you agree to MallChat's{" "}
-            <a href="/terms" className="text-mall-primary hover:underline">Terms of Service</a>
-            {" "}and{" "}
-            <a href="/privacy" className="text-mall-primary hover:underline">Privacy Policy</a>.
-          </p>
-        </CardFooter>
       </Card>
     </div>
   );
