@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -81,13 +80,13 @@ const ChatInterface = ({ chatId, onNewChat }: ChatInterfaceProps) => {
           },
           {
             id: '1-3',
-            content: 'I need good cushioning and support. I have flat feet and I'll be running long distances.',
+            content: "I need good cushioning and support. I have flat feet and I'll be running long distances.",
             sender: 'user',
             timestamp: new Date(Date.now() - 3560000)
           },
           {
             id: '1-4',
-            content: 'Based on your needs, I recommend shoes with stability features and extra cushioning. Here are some options that would work well for marathon training with flat feet:',
+            content: "Based on your needs, I recommend shoes with stability features and extra cushioning. Here are some options that would work well for marathon training with flat feet:",
             sender: 'assistant',
             timestamp: new Date(Date.now() - 3540000),
             products: sampleProducts
@@ -103,7 +102,7 @@ const ChatInterface = ({ chatId, onNewChat }: ChatInterfaceProps) => {
           },
           {
             id: '2-2',
-            content: 'I'd be happy to help with anniversary gift ideas! What kinds of things does your wife enjoy?',
+            content: "I'd be happy to help with anniversary gift ideas! What kinds of things does your wife enjoy?",
             sender: 'assistant',
             timestamp: new Date(Date.now() - 86380000)
           }
@@ -112,13 +111,13 @@ const ChatInterface = ({ chatId, onNewChat }: ChatInterfaceProps) => {
         initialMessages = [
           {
             id: '3-1',
-            content: 'I'm looking to redecorate my living room.',
+            content: "I'm looking to redecorate my living room.",
             sender: 'user',
             timestamp: new Date(Date.now() - 259200000)
           },
           {
             id: '3-2',
-            content: 'That sounds exciting! What style are you going for with your living room redecoration?',
+            content: "That sounds exciting! What style are you going for with your living room redecoration?",
             sender: 'assistant',
             timestamp: new Date(Date.now() - 259180000)
           }
@@ -128,7 +127,7 @@ const ChatInterface = ({ chatId, onNewChat }: ChatInterfaceProps) => {
         initialMessages = [
           {
             id: 'new-1',
-            content: 'Hello! I'm your shopping assistant. How can I help you discover products today?',
+            content: "Hello! I'm your shopping assistant. How can I help you discover products today?",
             sender: 'assistant',
             timestamp: new Date()
           }
