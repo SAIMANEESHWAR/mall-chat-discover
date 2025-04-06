@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
@@ -121,8 +122,8 @@ const VerifyOTP = () => {
               }}
             />
           </div>
-          <Button onClick={handleVerifyOtp} disabled={verifyOtpMutation.isLoading}>
-            {verifyOtpMutation.isLoading ? "Verifying..." : "Verify OTP"}
+          <Button onClick={handleVerifyOtp} disabled={verifyOtpMutation.isPending}>
+            {verifyOtpMutation.isPending ? "Verifying..." : "Verify OTP"}
           </Button>
         </CardContent>
       </Card>

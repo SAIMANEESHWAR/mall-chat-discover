@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Amazon, Facebook, ShoppingBag } from 'lucide-react';
+import { ShoppingBag, ShoppingCart, Package, Store } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const BrandsSection = () => {
@@ -8,7 +8,7 @@ const BrandsSection = () => {
   const brands = [
     {
       name: 'Amazon',
-      icon: <Amazon className="h-8 w-8 md:h-10 md:w-10" />,
+      icon: <ShoppingCart className="h-8 w-8 md:h-10 md:w-10" />,
       className: 'text-[#FF9900]'
     },
     {
@@ -18,12 +18,12 @@ const BrandsSection = () => {
     },
     {
       name: 'Myntra',
-      icon: <ShoppingBag className="h-8 w-8 md:h-10 md:w-10" />,
+      icon: <Package className="h-8 w-8 md:h-10 md:w-10" />,
       className: 'text-[#FF3F6C]'
     },
     {
       name: 'Meesho',
-      icon: <ShoppingBag className="h-8 w-8 md:h-10 md:w-10" />,
+      icon: <Store className="h-8 w-8 md:h-10 md:w-10" />,
       className: 'text-[#F43397]'
     }
   ];
