@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ShoppingBag } from 'lucide-react';
+import { login, saveAuthData } from '@/api/auth';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -27,15 +27,12 @@ const Login = () => {
     setIsLoading(true);
     
     try {
-      // This would be replaced with actual API call in a real app
-      setTimeout(() => {
-        // Simulate successful login
-        localStorage.setItem('user', JSON.stringify({ email }));
-        toast.success("Login successful!");
-        navigate('/dashboard');
-      }, 1500);
-    } catch (error) {
-      toast.error("Login failed. Please check your credentials.");
+      const authData = await login(email, password);
+      saveAuthData(authData);
+      toast.success("Login successful!");
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Login failed. Please check your credentials.");
     } finally {
       setIsLoading(false);
     }

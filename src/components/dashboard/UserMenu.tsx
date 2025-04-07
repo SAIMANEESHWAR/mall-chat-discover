@@ -12,13 +12,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { getUser, clearAuthData } from "@/api/auth";
 
 const UserMenu = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(() => {
-    const userData = localStorage.getItem('user');
-    return userData ? JSON.parse(userData) : null;
-  });
+  const [user] = useState(() => getUser());
 
   const getInitials = (email: string) => {
     if (!email) return "U";
@@ -32,7 +30,7 @@ const UserMenu = () => {
   };
 
   const handleSignOut = () => {
-    localStorage.removeItem('user');
+    clearAuthData();
     toast.success("You have been signed out");
     navigate('/login');
   };

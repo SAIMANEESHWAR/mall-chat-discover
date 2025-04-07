@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -8,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ShoppingBag } from 'lucide-react';
+import { register, saveAuthData } from '@/api/auth';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -46,20 +46,12 @@ const Register = () => {
     setIsLoading(true);
     
     try {
-      // This would be replaced with actual API call in a real app
-      setTimeout(() => {
-        // Simulate OTP generation and redirect to verify page
-        const tempUser = {
-          name: formData.name,
-          email: formData.email,
-          otpSent: true,
-        };
-        localStorage.setItem('tempUser', JSON.stringify(tempUser));
-        toast.success("Registration successful! Please verify your email.");
-        navigate('/verify-otp');
-      }, 1500);
-    } catch (error) {
-      toast.error("Registration failed. Please try again.");
+      const authData = await register(formData.name, formData.email, formData.password);
+      saveAuthData(authData);
+      toast.success("Registration successful! Welcome to MallChat.");
+      navigate('/dashboard');
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
